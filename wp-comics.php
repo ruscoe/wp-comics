@@ -16,4 +16,8 @@
  * @license  https://en.wikipedia.org/wiki/MIT_License MIT License
  */
 
-defined( 'ABSPATH' ) or exit;
+ defined( 'ABSPATH' ) || exit;
+
+ define( 'WP_COMICS__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+
+ require_once WP_COMICS__PLUGIN_DIR . 'class.wp-comics.php';
