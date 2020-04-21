@@ -25,6 +25,9 @@ class WP_Comics {
 		// register the comic post type.
 		add_action( 'init', array( $this, 'register_comic_post_type' ) );
 
+		// add meta boxes.
+		add_action( 'add_meta_boxes', array( $this, 'add_comic_meta_boxes' ) );
+
 		// activate hook.
 		register_activation_hook( __FILE__, array( $this, 'plugin_activate' ) );
 
@@ -115,6 +118,72 @@ class WP_Comics {
 		);
 
 		register_post_type( 'wp_comics', $args );
+	}
+
+	/**
+	 *
+	 *
+	 * @since 1.0.0
+	 */
+	public function add_comic_meta_boxes() {
+
+		add_meta_box(
+			// id.
+			'wp_comics_meta_box',
+			// name.
+			'Comic Information',
+			// display function.
+			array( $this, 'comic_meta_box_display' ),
+			// post type.
+			'wp_comics',
+			// location.
+			'normal',
+			// priority.
+			'default'
+		);
+	}
+
+	/**
+	 *
+	 *
+	 * @since 1.0.0
+	 */
+	public function comic_meta_box_display( $post ) {
+
+		// set nonce field.
+		wp_nonce_field( 'wp_comics_nonce', 'wp_comics_nonce_field' );
+
+		// collect variables.
+		$wp_comics_publisher = get_post_meta( $post->ID, 'wp_comics_publisher', true );
+
+		?>
+	<div class="field-container">
+		<?php
+		// before main form elements hook.
+		do_action( 'wp_comics_admin_form_start' );
+		?>
+		<div class="field">
+			<label for="wp_comics_publisher">Publisher</label>
+			<small>main contact number</small>
+			<select name="wp_comics_publisher" id="wp_comics_publisher">
+			<?php
+			if ( ! empty( $this->wp_comics_publishers ) ) {
+				foreach ( $this->wp_comics_publishers as $key => $name ) {
+					?>
+				  <option name="<?php echo sanitize_key( $key ); ?>"><?php echo sanitize_text_field( $name ); ?></option>
+					<?php
+				}
+			}
+			?>
+			</select>
+		</div>
+		<?php
+		// after main form elements hook.
+		do_action( 'wp_comics_admin_form_end' );
+    ?>
+  </div>
+		<?php
+
 	}
 
 }
