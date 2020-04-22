@@ -43,6 +43,9 @@ class WP_Comics {
 		// save comic.
 		add_action( 'save_post_wp_comics', array( $this, 'save_comic' ) );
 
+		// display meta before the content
+		add_filter( 'the_content', array( $this, 'prepend_comic_meta_to_content' ) );
+
 		// activate hook.
 		register_activation_hook( __FILE__, array( $this, 'plugin_activate' ) );
 
@@ -273,6 +276,88 @@ class WP_Comics {
 
 		// comic save hook.
 		do_action( 'wp_comics_admin_save', $post_id, $_POST );
+	}
+
+	/**
+	 *
+	 *
+	 * @since 1.0.0
+	 */
+	public function prepend_comic_meta_to_content( $content ) {
+
+		global $post, $post_type;
+
+		// display on single instances of the wp_comics content type.
+		if ( 'wp_comics' === $post_type && is_singular( 'wp_comics' ) ) {
+
+			$wp_comics_id = $post->ID;
+
+			$post_meta = array();
+
+			foreach ( $this->wp_comics_meta_fields as $field ) {
+				$post_meta[ $field ] = get_post_meta( $post->ID, $field, true );
+			}
+
+			// build markup.
+			$html = '';
+
+			$html .= '<section class="meta-data">';
+
+			// output any additional content before the comic meta data.
+			do_action( 'wp_comics_meta_data_output_start', $wp_comics_id );
+
+			$html .= '<p>';
+			// publisher.
+			if ( ! empty( $post_meta['wp_comics_publisher'] ) ) {
+				$publisher = $post_meta['wp_comics_publisher'];
+				$html     .= '<b>Publisher</b> ' . ( isset( $this->wp_comics_publishers[ $publisher ] ) ? $this->wp_comics_publishers[ $publisher ] : $publisher ) . '</br>';
+			}
+			// issue number.
+			if ( ! empty( $post_meta['wp_comics_issue'] ) ) {
+				$html .= '<b>Issue #</b> ' . $post_meta['wp_comics_issue'] . '</br>';
+			}
+			// date.
+			if ( ! empty( $post_meta['wp_comics_date'] ) ) {
+				$html .= '<b>Date</b> ' . $post_meta['wp_comics_date'] . '</br>';
+			}
+			// price.
+			if ( ! empty( $post_meta['wp_comics_price'] ) ) {
+				$html .= '<b>Price</b> ' . $post_meta['wp_comics_price'] . '</br>';
+			}
+			// cover artist.
+			if ( ! empty( $post_meta['wp_comics_cover_artist'] ) ) {
+				$html .= '<b>Cover artist</b> ' . $post_meta['wp_comics_cover_artist'] . '</br>';
+			}
+			// writer.
+			if ( ! empty( $post_meta['wp_comics_writer'] ) ) {
+				$html .= '<b>Writer</b> ' . $post_meta['wp_comics_writer'] . '</br>';
+			}
+			// penciller.
+			if ( ! empty( $post_meta['wp_comics_penciller'] ) ) {
+				$html .= '<b>Penciller</b> ' . $post_meta['wp_comics_penciller'] . '</br>';
+			}
+			// inker.
+			if ( ! empty( $post_meta['wp_comics_inker'] ) ) {
+				$html .= '<b>Inker</b> ' . $post_meta['wp_comics_inker'] . '</br>';
+			}
+			// colorist.
+			if ( ! empty( $post_meta['wp_comics_colorist'] ) ) {
+				$html .= '<b>Colorist</b> ' . $post_meta['wp_comics_colorist'] . '</br>';
+			}
+			$html .= '</p>';
+
+			// output any additional content after the comic meta data.
+			do_action( 'wp_comics_meta_data_output_end', $wp_comics_id );
+
+			$html .= '</section>';
+			$html .= $content;
+
+			return $html;
+
+		} else {
+			return $content;
+		}
+
 	}
 
 }
