@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WordPress Comics
  * Plugin URI: https://github.com/ruscoe/wp-comics/
- * Description: Catalogue your comic book collection in WordPress!
+ * Description: Catalog your comic book collection in WordPress!
  * Author: Dan Ruscoe
  * Author URI: http://ruscoe.org/
  * Version: 1.0.0
@@ -16,6 +16,7 @@
  * @license  https://en.wikipedia.org/wiki/MIT_License MIT License
  */
 
+// for security, don't allow direct access to this file.
 defined( 'ABSPATH' ) || exit;
 
 define( 'WP_COMICS__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );

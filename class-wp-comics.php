@@ -2,6 +2,8 @@
 
 
 /**
+ * WordPress Comics main plugin class
+ *
  * @package WordPress Comics
  */
 class WP_Comics {
@@ -10,8 +12,10 @@ class WP_Comics {
 	/** plugin version number */
 	const VERSION = '1.0.0';
 
+	/** @var array names of comic book publishing companies */
 	private $wp_comics_publishers = array();
 
+	/** @var array meta data fields for the wp_comics post type */
 	private $wp_comics_meta_fields = array(
 		'wp_comics_publisher',
 		'wp_comics_issue',
@@ -43,7 +47,7 @@ class WP_Comics {
 		// save comic.
 		add_action( 'save_post_wp_comics', array( $this, 'save_comic' ) );
 
-		// display meta before the content
+		// display meta before the content.
 		add_filter( 'the_content', array( $this, 'prepend_comic_meta_to_content' ) );
 
 		// activate hook.
@@ -74,7 +78,7 @@ class WP_Comics {
 	}
 
 	/**
-	 *
+	 * Sets the names of comic book publishers that can be selected
 	 *
 	 * @since 1.0.0
 	 */
@@ -88,12 +92,13 @@ class WP_Comics {
 				'dc'         => 'DC Comics',
 				'image'      => 'Image Comics',
 				'marvel'     => 'Marvel Comics',
+				'other'      => 'Other',
 			)
 		);
 	}
 
 	/**
-	 *
+	 * Registers the wp_comics post type, the new post type this plugin provides
 	 *
 	 * @since 1.0.0
 	 */
@@ -139,7 +144,7 @@ class WP_Comics {
 	}
 
 	/**
-	 *
+	 * Adds meta boxes containing meta data fields for wp_comics posts.
 	 *
 	 * @since 1.0.0
 	 */
@@ -162,7 +167,9 @@ class WP_Comics {
 	}
 
 	/**
+	 * Displays meta data fields for wp_comics posts
 	 *
+	 * @param \WP_Post $post the wp_comics post.
 	 *
 	 * @since 1.0.0
 	 */
@@ -173,6 +180,7 @@ class WP_Comics {
 
 		$post_meta = array();
 
+		// load the post meta data.
 		foreach ( $this->wp_comics_meta_fields as $field ) {
 			$post_meta[ $field ] = get_post_meta( $post->ID, $field, true );
 		}
@@ -191,7 +199,7 @@ class WP_Comics {
 				foreach ( $this->wp_comics_publishers as $key => $name ) {
 					$selected = ( $key === $post_meta['wp_comics_publisher'] ) ? ' selected="true"' : '';
 					?>
-				  <option value="<?php echo sanitize_key( $key ); ?>"<?php echo $selected; ?>><?php echo sanitize_text_field( $name ); ?></option>
+				  <option value="<?php echo sanitize_key( $key ); ?>"<?php echo esc_attr( $selected ); ?>><?php echo esc_attr( $name ); ?></option>
 					<?php
 				}
 			}
@@ -200,35 +208,35 @@ class WP_Comics {
 		</div>
 	<div class="field">
 	  <label for="wp_comics_issue">Issue #</label>
-	  <input type="text" name="wp_comics_issue" id="wp_comics_issue" value="<?php echo $post_meta['wp_comics_issue']; ?>" />
+	  <input type="text" name="wp_comics_issue" id="wp_comics_issue" value="<?php echo esc_attr( $post_meta['wp_comics_issue'] ); ?>" />
 	</div>
 	<div class="field">
 	  <label for="wp_comics_date">Date</label>
-	  <input type="text" name="wp_comics_date" id="wp_comics_date" value="<?php echo $post_meta['wp_comics_date']; ?>" />
+	  <input type="text" name="wp_comics_date" id="wp_comics_date" value="<?php echo esc_attr( $post_meta['wp_comics_date'] ); ?>" />
 	</div>
 	<div class="field">
 	  <label for="wp_comics_price">Price</label>
-	  <input type="text" name="wp_comics_price" id="wp_comics_price" value="<?php echo $post_meta['wp_comics_price']; ?>" />
+	  <input type="text" name="wp_comics_price" id="wp_comics_price" value="<?php echo esc_attr( $post_meta['wp_comics_price'] ); ?>" />
 	</div>
 	<div class="field">
 	  <label for="wp_comics_cover_artist">Cover artist</label>
-	  <input type="text" name="wp_comics_cover_artist" id="wp_comics_cover_artist" value="<?php echo $post_meta['wp_comics_cover_artist']; ?>" />
+	  <input type="text" name="wp_comics_cover_artist" id="wp_comics_cover_artist" value="<?php echo esc_attr( $post_meta['wp_comics_cover_artist'] ); ?>" />
 	</div>
 	<div class="field">
 	  <label for="wp_comics_writer">Writer</label>
-	  <input type="text" name="wp_comics_writer" id="wp_comics_writer" value="<?php echo $post_meta['wp_comics_writer']; ?>" />
+	  <input type="text" name="wp_comics_writer" id="wp_comics_writer" value="<?php echo esc_attr( $post_meta['wp_comics_writer'] ); ?>" />
 	</div>
 	<div class="field">
 	  <label for="wp_comics_penciller">Penciller</label>
-	  <input type="text" name="wp_comics_penciller" id="wp_comics_penciller" value="<?php echo $post_meta['wp_comics_penciller']; ?>" />
+	  <input type="text" name="wp_comics_penciller" id="wp_comics_penciller" value="<?php echo esc_attr( $post_meta['wp_comics_penciller'] ); ?>" />
 	</div>
 	<div class="field">
 	  <label for="wp_comics_inker">Inker</label>
-	  <input type="text" name="wp_comics_inker" id="wp_comics_inker" value="<?php echo $post_meta['wp_comics_inker']; ?>" />
+	  <input type="text" name="wp_comics_inker" id="wp_comics_inker" value="<?php echo esc_attr( $post_meta['wp_comics_inker'] ); ?>" />
 	</div>
 	<div class="field">
 	  <label for="wp_comics_colorist">Colorist</label>
-	  <input type="text" name="wp_comics_colorist" id="wp_comics_colorist" value="<?php echo $post_meta['wp_comics_colorist']; ?>" />
+	  <input type="text" name="wp_comics_colorist" id="wp_comics_colorist" value="<?php echo esc_attr( $post_meta['wp_comics_colorist'] ); ?>" />
 	</div>
 		<?php
 		// after main form elements hook.
@@ -239,7 +247,9 @@ class WP_Comics {
 	}
 
 	/**
+	 * Saves the wp_comics post meta data.
 	 *
+	 * @param int $post_id the id of the wp_comics post.
 	 *
 	 * @since 1.0.0
 	 */
@@ -251,7 +261,7 @@ class WP_Comics {
 		}
 
 		// verify nonce.
-		if ( ! wp_verify_nonce( $_POST['wp_comics_nonce_field'], 'wp_comics_nonce' ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['wp_comics_nonce_field'] ) ), 'wp_comics_nonce' ) ) {
 			return $post_id;
 		}
 
@@ -265,7 +275,7 @@ class WP_Comics {
 
 		foreach ( $this->wp_comics_meta_fields as $field ) {
 			if ( isset( $_POST[ $field ] ) ) {
-				$updated_post_meta[ $field ] = sanitize_text_field( $_POST[ $field ] );
+				$updated_post_meta[ $field ] = sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
 			}
 		}
 
@@ -279,7 +289,9 @@ class WP_Comics {
 	}
 
 	/**
+	 * Adds comic meta data to wp_comics posts
 	 *
+	 * @param string $content the content of the post.
 	 *
 	 * @since 1.0.0
 	 */
