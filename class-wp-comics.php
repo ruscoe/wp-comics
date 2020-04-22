@@ -28,6 +28,9 @@ class WP_Comics {
 		// add meta boxes.
 		add_action( 'add_meta_boxes', array( $this, 'add_comic_meta_boxes' ) );
 
+		// save comic.
+		add_action( 'save_post_wp_comics', array( $this, 'save_comic' ) );
+
 		// activate hook.
 		register_activation_hook( __FILE__, array( $this, 'plugin_activate' ) );
 
@@ -164,13 +167,13 @@ class WP_Comics {
 		?>
 		<div class="field">
 			<label for="wp_comics_publisher">Publisher</label>
-			<small>main contact number</small>
 			<select name="wp_comics_publisher" id="wp_comics_publisher">
 			<?php
 			if ( ! empty( $this->wp_comics_publishers ) ) {
 				foreach ( $this->wp_comics_publishers as $key => $name ) {
+					$selected = ( $key === $wp_comics_publisher ) ? ' selected="true"' : '';
 					?>
-				  <option name="<?php echo sanitize_key( $key ); ?>"><?php echo sanitize_text_field( $name ); ?></option>
+				  <option value="<?php echo sanitize_key( $key ); ?>"<?php echo $selected; ?>><?php echo sanitize_text_field( $name ); ?></option>
 					<?php
 				}
 			}
@@ -180,10 +183,41 @@ class WP_Comics {
 		<?php
 		// after main form elements hook.
 		do_action( 'wp_comics_admin_form_end' );
-    ?>
+		?>
   </div>
 		<?php
+	}
 
+	/**
+	 *
+	 *
+	 * @since 1.0.0
+	 */
+	public function save_comic( $post_id ) {
+
+		// check for nonce.
+		if ( ! isset( $_POST['wp_comics_nonce_field'] ) ) {
+			return $post_id;
+		}
+
+		// verify nonce.
+		if ( ! wp_verify_nonce( $_POST['wp_comics_nonce_field'], 'wp_comics_nonce' ) ) {
+			return $post_id;
+		}
+
+		// check for autosave.
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return $post_id;
+		}
+
+		// get fields.
+		$wp_comics_publisher = isset( $_POST['wp_comics_publisher'] ) ? sanitize_text_field( $_POST['wp_comics_publisher'] ) : '';
+
+		// update fields.
+		update_post_meta( $post_id, 'wp_comics_publisher', $wp_comics_publisher );
+
+		// comic save hook.
+		do_action( 'wp_comics_admin_save', $post_id, $_POST );
 	}
 
 }
