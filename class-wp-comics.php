@@ -12,6 +12,18 @@ class WP_Comics {
 
 	private $wp_comics_publishers = array();
 
+	private $wp_comics_meta_fields = array(
+		'wp_comics_publisher',
+		'wp_comics_issue',
+		'wp_comics_date',
+		'wp_comics_price',
+		'wp_comics_cover_artist',
+		'wp_comics_writer',
+		'wp_comics_penciller',
+		'wp_comics_inker',
+		'wp_comics_colorist',
+	);
+
 	/**
 	 * Initializes the plugin
 	 *
@@ -156,8 +168,11 @@ class WP_Comics {
 		// set nonce field.
 		wp_nonce_field( 'wp_comics_nonce', 'wp_comics_nonce_field' );
 
-		// collect variables.
-		$wp_comics_publisher = get_post_meta( $post->ID, 'wp_comics_publisher', true );
+		$post_meta = array();
+
+		foreach ( $this->wp_comics_meta_fields as $field ) {
+			$post_meta[ $field ] = get_post_meta( $post->ID, $field, true );
+		}
 
 		?>
 	<div class="field-container">
@@ -171,7 +186,7 @@ class WP_Comics {
 			<?php
 			if ( ! empty( $this->wp_comics_publishers ) ) {
 				foreach ( $this->wp_comics_publishers as $key => $name ) {
-					$selected = ( $key === $wp_comics_publisher ) ? ' selected="true"' : '';
+					$selected = ( $key === $post_meta['wp_comics_publisher'] ) ? ' selected="true"' : '';
 					?>
 				  <option value="<?php echo sanitize_key( $key ); ?>"<?php echo $selected; ?>><?php echo sanitize_text_field( $name ); ?></option>
 					<?php
@@ -180,6 +195,38 @@ class WP_Comics {
 			?>
 			</select>
 		</div>
+	<div class="field">
+	  <label for="wp_comics_issue">Issue #</label>
+	  <input type="text" name="wp_comics_issue" id="wp_comics_issue" value="<?php echo $post_meta['wp_comics_issue']; ?>" />
+	</div>
+	<div class="field">
+	  <label for="wp_comics_date">Date</label>
+	  <input type="text" name="wp_comics_date" id="wp_comics_date" value="<?php echo $post_meta['wp_comics_date']; ?>" />
+	</div>
+	<div class="field">
+	  <label for="wp_comics_price">Price</label>
+	  <input type="text" name="wp_comics_price" id="wp_comics_price" value="<?php echo $post_meta['wp_comics_price']; ?>" />
+	</div>
+	<div class="field">
+	  <label for="wp_comics_cover_artist">Cover artist</label>
+	  <input type="text" name="wp_comics_cover_artist" id="wp_comics_cover_artist" value="<?php echo $post_meta['wp_comics_cover_artist']; ?>" />
+	</div>
+	<div class="field">
+	  <label for="wp_comics_writer">Writer</label>
+	  <input type="text" name="wp_comics_writer" id="wp_comics_writer" value="<?php echo $post_meta['wp_comics_writer']; ?>" />
+	</div>
+	<div class="field">
+	  <label for="wp_comics_penciller">Penciller</label>
+	  <input type="text" name="wp_comics_penciller" id="wp_comics_penciller" value="<?php echo $post_meta['wp_comics_penciller']; ?>" />
+	</div>
+	<div class="field">
+	  <label for="wp_comics_inker">Inker</label>
+	  <input type="text" name="wp_comics_inker" id="wp_comics_inker" value="<?php echo $post_meta['wp_comics_inker']; ?>" />
+	</div>
+	<div class="field">
+	  <label for="wp_comics_colorist">Colorist</label>
+	  <input type="text" name="wp_comics_colorist" id="wp_comics_colorist" value="<?php echo $post_meta['wp_comics_colorist']; ?>" />
+	</div>
 		<?php
 		// after main form elements hook.
 		do_action( 'wp_comics_admin_form_end' );
@@ -211,10 +258,18 @@ class WP_Comics {
 		}
 
 		// get fields.
-		$wp_comics_publisher = isset( $_POST['wp_comics_publisher'] ) ? sanitize_text_field( $_POST['wp_comics_publisher'] ) : '';
+		$updated_post_meta = array();
+
+		foreach ( $this->wp_comics_meta_fields as $field ) {
+			if ( isset( $_POST[ $field ] ) ) {
+				$updated_post_meta[ $field ] = sanitize_text_field( $_POST[ $field ] );
+			}
+		}
 
 		// update fields.
-		update_post_meta( $post_id, 'wp_comics_publisher', $wp_comics_publisher );
+		foreach ( $updated_post_meta as $field => $value ) {
+			update_post_meta( $post_id, $field, $value );
+		}
 
 		// comic save hook.
 		do_action( 'wp_comics_admin_save', $post_id, $_POST );
